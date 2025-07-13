@@ -16,7 +16,13 @@ and it transforms that into:
 git mv a.py b.py c.py src/
 ```
 
-Because Windows CMD does NOT expand wildcards in arguments. So if you run:
+I like to rename it to $.exe and then you can write 
+
+```cmd
+$ git mv *.py src/
+```
+
+WHY ? - Because Windows CMD does NOT expand wildcards in arguments. So if you run:
 
 ```cmd
 git mv *.py src/
