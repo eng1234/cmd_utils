@@ -4,17 +4,7 @@
 
 ## 🚀 What It Does
 
-Windows CMD does **not** expand wildcards in arguments. So if you run:
-
-```cmd
-git mv *.py src/
-```
-
-you get an error like:
-
-> fatal: bad source, source=*.py, destination=src/*.py
-
-With **Globber**, you can instead run:
+With **Globber**, you can run:
 
 ```cmd
 globber git mv *.py src/
@@ -25,6 +15,17 @@ and it transforms that into:
 ```cmd
 git mv a.py b.py c.py src/
 ```
+
+Because Windows CMD does NOT expand wildcards in arguments. So if you run:
+
+```cmd
+git mv *.py src/
+```
+
+you get an error like:
+
+> fatal: bad source, source=*.py, destination=src/*.py
+
 
 ## ✅ Features
 
@@ -57,6 +58,8 @@ Using Tiny C Compiler:
 ```cmd
 tcc -o globber.exe globber.c
 ```
+
+Link to Tiny C Compiler: https://bellard.org/tcc/
 
 Or MSVC:
 
@@ -153,6 +156,4 @@ MIT — free to use, hack, and share.
 ✨ Inspired By
 
 Unix shells that just do this right.
-
-Want icon ideas, batch wrappers, or a .man help page? Let me know!
 
