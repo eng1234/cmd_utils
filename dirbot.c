@@ -1,7 +1,23 @@
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
+#include <direct.h>  // for _getcwd
+
+void walk_directory(const char *base);
+
+void print_usage(void)
+{
+    printf("Dirbot - Recursive File Lister with Size and Timestamp\n");
+    printf("Usage:\n");
+    printf("  dirbot.exe [start_folder]\n");
+    printf("\n");
+    printf("If no folder is provided, current directory is used.\n");
+    printf("Output format:\n");
+    printf("  full_path,\\tfile_size,\\ttimestamp\n");
+    printf("Example:\n");
+    printf("  dirbot.exe C:\\Projects > out.txt\n");
+}
 
 void print_file_info(const char *path, WIN32_FIND_DATAA *fdata)
 {
@@ -36,7 +52,6 @@ void print_file_info(const char *path, WIN32_FIND_DATAA *fdata)
     printf("%s,\t%lld,\t%s\n", formatted_path, filesize.QuadPart, datetime);
 }
 
-
 void walk_directory(const char *base)
 {
     WIN32_FIND_DATAA fdata;
@@ -65,19 +80,6 @@ void walk_directory(const char *base)
     FindClose(hFind);
 }
 
-void print_usage(void)
-{
-    printf("Dirbot - Recursive File Lister with Size and Timestamp\n");
-    printf("Usage:\n");
-    printf("  dirbot.exe [start_folder]\n");
-    printf("\n");
-    printf("If no folder is provided, current directory is used.\n");
-    printf("Output format:\n");
-    printf("  full_path,\\tfile_size,\\ttimestamp\n");
-    printf("Example:\n");
-    printf("  dirbot.exe C:\\Projects > out.txt\n");
-}
-
 int main(int argc, char *argv[])
 {
     char start[MAX_PATH];
@@ -93,16 +95,33 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        // Validate if path exists and is a directory
-        DWORD attr = GetFileAttributesA(argv[1]);
+        // Handle "\" by converting to current drive root
+        if (strcmp(argv[1], "\\") == 0)
+        {
+            char drive[MAX_PATH];
+            if (_getcwd(drive, MAX_PATH))
+            {
+                drive[2] = '\0'; // keep only "C:"
+                snprintf(start, MAX_PATH, "%s\\", drive);
+            }
+            else
+            {
+                fprintf(stderr, "Error: Failed to determine current drive.\n");
+                return 1;
+            }
+        }
+        else
+        {
+            strncpy(start, argv[1], MAX_PATH - 1);
+            start[MAX_PATH - 1] = '\0';
+        }
+
+        DWORD attr = GetFileAttributesA(start);
         if (attr == INVALID_FILE_ATTRIBUTES || !(attr & FILE_ATTRIBUTE_DIRECTORY))
         {
             fprintf(stderr, "Error: '%s' is not a valid directory.\n", argv[1]);
             return 1;
         }
-
-        strncpy(start, argv[1], MAX_PATH - 1);
-        start[MAX_PATH - 1] = '\0';
     }
     else
     {
